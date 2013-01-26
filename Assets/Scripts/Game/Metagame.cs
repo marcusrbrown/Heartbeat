@@ -8,6 +8,10 @@ public class Metagame : MonoBehaviour
 
     private Heartbeat heartbeat_;
 
+    public void CheckPulseCollisions(Vector2 pulseCenter, float pulseRadius)
+    {
+    }
+
     private void Awake()
     {
         if (this.player == null)
@@ -20,8 +24,6 @@ public class Metagame : MonoBehaviour
         if (this.enemies == null)
         {
             Debug.LogWarning("Attach a GameObject containing enemies to the Metagame component.");
-            this.enabled = false;
-            return;
         }
 
         if (this.items == null)

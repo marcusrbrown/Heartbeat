@@ -11,7 +11,7 @@ public class Heartbeat : MonoBehaviour
     public float pulseStartRadius = 1.0f;
     public GameObject pulseWave;
 
-    private Metagame metagame_;
+    private static Metagame metagame_;
     private float elapsed_;
 
     private Dictionary<int, Pulse> activePulses_ = new Dictionary<int, Pulse>();
@@ -101,11 +101,8 @@ public class Heartbeat : MonoBehaviour
             SonarWave sonarWave = pulse.SonarWave;
             float radius = sonarWave != null ? sonarWave.GetPulseRadius() : pulse.Radius;
 
-            radius += pulse.Speed * deltaTime;
-
-            // MRBrown@PM 1/26/2013: TODO: Ask the metagame who got hit by the ping.
-
-            pulse.Radius = radius;
+            pulse.Radius = radius + pulse.Speed * deltaTime;
+            metagame_.CheckPulseCollisions(pulse.Center, pulse.Radius);
         }
     }
 
