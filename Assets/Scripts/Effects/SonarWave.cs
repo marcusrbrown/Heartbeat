@@ -14,6 +14,7 @@ public class SonarWave : MonoBehaviour
     public float speed = 1.0f;
 
     private LineRenderer lineRenderer_;
+    private Vector3 drawPosition_;
     private float elapsed_;
     private float pulseRadius_;
     private bool pulsing_;
@@ -22,14 +23,19 @@ public class SonarWave : MonoBehaviour
     {
         elapsed_ = 0.0f;
         pulseRadius_ = this.radius;
+
+        // Position the line renderer along the Y axis (world coordinates).
+        drawPosition_.y = this.y;
+        this.transform.position = drawPosition_;
+
         lineRenderer_.enabled = true;
         pulsing_ = true;
-        Debug.Log("Pulsing!");
     }
 
     private void Awake()
     {
         lineRenderer_ = this.gameObject.GetComponent<LineRenderer>();
+        drawPosition_ = this.gameObject.transform.position;
     }
 
     private IEnumerator Start()
@@ -74,7 +80,7 @@ public class SonarWave : MonoBehaviour
             float x = Mathf.Sin(angle * Mathf.Deg2Rad);
             float z = Mathf.Cos(angle * Mathf.Deg2Rad);
 
-            lineRenderer_.SetPosition(i, new Vector3(x, this.y, z) * pulseRadius_);
+            lineRenderer_.SetPosition(i, new Vector3(x, 0.0f, z) * pulseRadius_);
             angle += (360.0f / segments);
         }
     }
