@@ -19,16 +19,14 @@ public class Metagame : MonoBehaviour
 
         if (this.enemies == null)
         {
-            Debug.LogError("Attach a GameObject containing enemies to the Metagame component.");
+            Debug.LogWarning("Attach a GameObject containing enemies to the Metagame component.");
             this.enabled = false;
             return;
         }
 
         if (this.items == null)
         {
-            Debug.LogError("Attach a GameObject containing items to the Metagame component.");
-            this.enabled = false;
-            return;
+            Debug.LogWarning("Attach a GameObject containing items to the Metagame component.");
         }
 
         heartbeat_ = this.player.GetComponent<Heartbeat>();

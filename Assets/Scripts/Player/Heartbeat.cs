@@ -23,6 +23,12 @@ public class Heartbeat : MonoBehaviour
 
     private void Start()
     {
+        if (metagame_ == null)
+        {
+            Debug.LogError("Missing Metagame instance. Add a GameObject and attach the Metagame script.");
+            this.enabled = false;
+            return;
+        }
 	}
 
     // MRBrown@PM 1/25/2013: TODO: Support a paused state.
