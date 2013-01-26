@@ -4,9 +4,14 @@ using System.Collections;
 public class Heartbeat : MonoBehaviour
 {
     public float interval = 8.0f;
+    public float duration = 5.0f;
+
+    public float radiusStep = 1.0f;
 
     private Metagame metagame_;
     private bool disabled_;
+
+    private float sonarRadius_;
 
     public void SetMetagame(Metagame metagame)
     {
@@ -27,19 +32,27 @@ public class Heartbeat : MonoBehaviour
 
             Debug.Log("Ping!");
 
-            // Ping all enemies and items.
-            if (metagame_.enemies != null)
-            {
-                metagame_.enemies.SendMessage("OnPing", this);
-            }
-
-            if (metagame_.items != null)
-            {
-                metagame_.items.SendMessage("OnPing", this);
-            }
+            StartCoroutine(Sonar(this.duration));
         }
     }
-	
+
+    private IEnumerator Sonar(float seconds)
+    {
+        float currentTime = Time.time;
+        float endTime = currentTime + seconds;
+
+        // Start at 1 unity out from the player.
+        sonarRadius_ = 1.0f;
+
+        while (currentTime < endTime)
+        {
+            sonarRadius_ += radiusStep * Time.deltaTime;
+
+            yield return new WaitForEndOfFrame();
+            currentTime = Time.time;
+        }
+    }
+
 	private void Update()
     {
 	}
