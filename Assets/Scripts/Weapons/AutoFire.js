@@ -54,7 +54,9 @@ function Update () {
 				
 				// Ricochet sound
 				var sound : AudioClip = MaterialImpactManager.GetBulletHitSound (hitInfo.collider.sharedMaterial);
-				AudioSource.PlayClipAtPoint (sound, hitInfo.point, hitSoundVolume);
+				if (sound != null) {
+				    AudioSource.PlayClipAtPoint (sound, hitInfo.point, hitSoundVolume);
+				}
 				
 				bullet.dist = hitInfo.distance;
 			}

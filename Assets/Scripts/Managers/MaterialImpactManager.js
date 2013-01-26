@@ -11,13 +11,12 @@ class MaterialImpact {
 class MaterialImpactManager extends MonoBehaviour {
 	var materials : MaterialImpact[];
 	
-	private static var dict : System.Collections.Generic.Dictionary.<PhysicMaterial, MaterialImpact>;
-	private static var defaultMat : MaterialImpact;
+	private static var dict : System.Collections.Generic.Dictionary.<PhysicMaterial, MaterialImpact> = new System.Collections.Generic.Dictionary.<PhysicMaterial, MaterialImpact> ();
+	private static var defaultMat : MaterialImpact = new MaterialImpact ();
 	
 	function Awake () {
 		defaultMat = materials[0];
 		
-		dict = new System.Collections.Generic.Dictionary.<PhysicMaterial, MaterialImpact> ();
 		for (var i : int = 0; i < materials.Length; i++) {
 			dict.Add (materials[i].physicMaterial, materials[i]);
 		}
@@ -50,7 +49,7 @@ class MaterialImpactManager extends MonoBehaviour {
 	}
 	
 	static function GetRandomSoundFromArray (audioClipArray : AudioClip[]) : AudioClip {
-		if (audioClipArray.Length > 0)
+		if (audioClipArray && audioClipArray.Length > 0)
 			return audioClipArray[Random.Range (0, audioClipArray.Length)];
 		return null;
 	}

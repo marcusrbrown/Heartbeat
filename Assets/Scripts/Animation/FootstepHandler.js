@@ -16,6 +16,9 @@ function OnCollisionEnter (collisionInfo : Collision) {
 }
 
 function OnFootstep () {
+	if (physicMaterial == null)
+		return;
+
 	var sound : AudioClip;
 	switch (footType) {
 	case FootType.Player:
@@ -28,6 +31,9 @@ function OnFootstep () {
 		sound = MaterialImpactManager.GetSpiderFootstepSound (physicMaterial);
 		break;
 	}	
-	audioSource.pitch = Random.Range (0.98, 1.02);
-	audioSource.PlayOneShot (sound, Random.Range (0.8, 1.2));
+
+	if (sound != null) {
+	    audioSource.pitch = Random.Range (0.98, 1.02);
+	    audioSource.PlayOneShot (sound, Random.Range (0.8, 1.2));
+	}
 }

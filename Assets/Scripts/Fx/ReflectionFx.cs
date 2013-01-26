@@ -41,7 +41,8 @@ public class ReflectionFx : MonoBehaviour
 		// restore initial reflection textures
 		for (int i = 0; i < reflectiveMaterials.Length; i++)
 		{
-			reflectiveMaterials[i].SetTexture(reflectionSampler, initialReflectionTextures[i]);
+            if ((reflectiveMaterials[i] != null) && (initialReflectionTextures != null))
+			    reflectiveMaterials[i].SetTexture(reflectionSampler, initialReflectionTextures[i]);
 		}
 	}
 	

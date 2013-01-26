@@ -13,7 +13,8 @@ function Start () {
 
 function Update () {
 	var relativeHealth : float = playerHealth.health * oneOverMaxHealth;
-	healthMaterial.SetFloat ("_SelfIllumination", relativeHealth * 2.0f * healthBlink);
+	if (healthMaterial != null)
+	    healthMaterial.SetFloat ("_SelfIllumination", relativeHealth * 2.0f * healthBlink);
 	
 	if (relativeHealth < 0.45f) 
 		healthBlink = Mathf.PingPong (Time.time * 6.0f, 2.0f);

@@ -11,17 +11,27 @@ private var character : Transform;
 private var nextPatrolPoint : int = 0;
 private var patrolDirection : int = 1;
 
+function Awake () {
+	if (patrolRoute == null) {
+		this.enabled = false;
+		return;
+	}
+}
+
 function Start () {
 	character = motor.transform;
-	patrolRoute.Register (transform.parent.gameObject);
+	if (patrolRoute != null)
+	    patrolRoute.Register (transform.parent.gameObject);
 }
 
 function OnEnable () {
-	nextPatrolPoint = patrolRoute.GetClosestPatrolPoint (transform.position);
+	if (patrolRoute != null)
+	    nextPatrolPoint = patrolRoute.GetClosestPatrolPoint (transform.position);
 }
 
 function OnDestroy () {
-	patrolRoute.UnRegister (transform.parent.gameObject);
+	if (patrolRoute != null)
+	    patrolRoute.UnRegister (transform.parent.gameObject);
 }
 
 function Update () {

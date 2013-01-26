@@ -4,6 +4,9 @@
 var checkpoint : Transform;
 
 function OnSignal () {
+	if (checkpoint == null)
+		return;
+
 	transform.position = checkpoint.position;
 	transform.rotation = checkpoint.rotation;
 	
