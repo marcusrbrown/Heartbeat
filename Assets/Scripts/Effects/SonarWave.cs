@@ -32,9 +32,20 @@ public class SonarWave : MonoBehaviour
         pulsing_ = true;
     }
 
+    public float GetPulseRadius()
+    {
+        if (pulsing_)
+        {
+            return pulseRadius_;
+        }
+
+        return 0.0f;
+    }
+
     private void Awake()
     {
         lineRenderer_ = this.gameObject.GetComponent<LineRenderer>();
+        lineRenderer_.enabled = false;
         drawPosition_ = this.gameObject.transform.position;
     }
 
@@ -42,7 +53,6 @@ public class SonarWave : MonoBehaviour
     {
         lineRenderer_.SetVertexCount(this.segments + 1);
         lineRenderer_.useWorldSpace = false;
-        lineRenderer_.enabled = false;
 
         while (this.autoPulse)
         {

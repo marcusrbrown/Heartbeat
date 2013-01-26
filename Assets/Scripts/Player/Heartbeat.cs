@@ -1,102 +1,156 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Heartbeat : MonoBehaviour
 {
-    private class SonarWave
-    {
-        public readonly int Id;
-        public readonly Vector2 Center;
-        public float Duration;
-        public float Radius;
-        public float RadiusStep;
-
-        private static int nextId_;
-
-        internal SonarWave(Vector2 center, float duration, float radius, float radiusStep)
-        {
-            Center = center;
-            Duration = duration;
-            Radius = radius;
-            RadiusStep = radiusStep;
-            Id = ++nextId_;
-        }
-    }
-
     public float interval = 8.0f;
-    public float duration = 5.0f;
-
-    public float radiusStep = 1.0f;
+    public float pulseWaveDuration = 5.0f;
+    public float pulseWaveSpeed = 1.0f;
+    public float pulseStartRadius = 1.0f;
+    public GameObject pulseWave;
 
     private Metagame metagame_;
-    private bool disabled_;
+    private float elapsed_;
 
-    private Dictionary<int, SonarWave> sonarWaves_ = new Dictionary<int, SonarWave>();
+    private Dictionary<int, Pulse> activePulses_ = new Dictionary<int, Pulse>();
 
     public void SetMetagame(Metagame metagame)
     {
         metagame_ = metagame;
     }
 
-    protected void OnPong(Object sender)
+    private void Start()
     {
-    }
-
-	private void Start()
-    {
-        StartCoroutine(Ping(interval));
 	}
 
     // MRBrown@PM 1/25/2013: TODO: Support a paused state.
-    private IEnumerator Ping(float seconds)
+    private IEnumerator Ping()
     {
-        while (!disabled_)
-        {
-            yield return new WaitForSeconds(seconds);
+        Debug.Log("Ping!");
 
-            Debug.Log("Ping!");
+        // The center is wherever the player currently is located.
+        Vector2 center = new Vector2(this.transform.position.x, this.transform.position.z);
 
-            // The center is wherever the player currently is located.
-            Vector2 center = new Vector2(this.transform.position.x, this.transform.position.y);
-
-            StartCoroutine(Sonar(CreateSonarWave(center)));
-        }
+        CreatePulse(center);
+        yield break;
     }
 
-    private IEnumerator Sonar(SonarWave sonarWave)
+    private Pulse CreatePulse(Vector2 center)
     {
-        float currentTime = Time.time;
-        float endTime = currentTime + sonarWave.Duration;
+        GameObject sonarWave = null;
 
-        while (currentTime < endTime)
+        if (this.pulseWave != null)
         {
-            float deltaTime = Time.deltaTime;
+            // Face the wave torwards camera.
+            // MRBrown@PM 1/26/2013: TODO: Do this in the wave, not here.
+            Camera mainCamera = this.camera ? this.camera : Camera.main;
+            Quaternion cameraRotation = mainCamera.transform.rotation;
+            Vector3 position = this.transform.position;
+            Quaternion rotation = Quaternion.LookRotation(position + (cameraRotation * Vector3.back),
+                                                          cameraRotation * Vector3.up);
 
-            sonarWave.Radius += sonarWave.RadiusStep * Time.deltaTime;
-
-            yield return new WaitForEndOfFrame();
-            currentTime += deltaTime;
+            sonarWave = Instantiate(this.pulseWave, position, this.transform.rotation) as GameObject;
         }
 
-        RemoveSonarWave(sonarWave);
-    }
+        Pulse wave = new Pulse(sonarWave, center, this.pulseWaveDuration, this.pulseStartRadius, this.pulseWaveSpeed);
 
-    private SonarWave CreateSonarWave(Vector2 center)
-    {
-        // Start the radius at one unit out from the player.
-        SonarWave wave = new SonarWave(center, this.duration, 1.0f, this.radiusStep);
-
-        sonarWaves_.Add(wave.Id, wave);
+        activePulses_.Add(wave.Id, wave);
         return wave;
     }
 
-    private void RemoveSonarWave(SonarWave sonarWave)
+    private void RemovePulse(Pulse pulse)
     {
-        sonarWaves_.Remove(sonarWave.Id);
+        if (pulse.SonarWave != null)
+        {
+            Destroy(pulse.SonarWave.gameObject);
+        }
+
+        activePulses_.Remove(pulse.Id);
     }
 
 	private void Update()
     {
+        float deltaTime = Time.deltaTime;
+
+        elapsed_ += deltaTime;
+
+        if (elapsed_ >= this.interval)
+        {
+            elapsed_ = 0.0f;
+            StartCoroutine(Ping());
+        }
+
+        UpdatePulses(deltaTime);
 	}
+
+    private void UpdatePulses(float deltaTime)
+    {
+        Pulse[] pulses = activePulses_.Values.ToArray();
+
+        foreach (Pulse pulse in pulses)
+        {
+            pulse.Elapsed += deltaTime;
+
+            if (pulse.Elapsed >= pulse.Duration)
+            {
+                RemovePulse(pulse);
+                continue;
+            }
+
+            // If there's a SonarWave instance attached, use its radius, otherwise keep track of our own.
+            SonarWave sonarWave = pulse.SonarWave;
+            float radius = sonarWave != null ? sonarWave.GetPulseRadius() : pulse.Radius;
+
+            radius += pulse.Speed * deltaTime;
+
+            // MRBrown@PM 1/26/2013: TODO: Ask the metagame who got hit by the ping.
+
+            pulse.Radius = radius;
+        }
+    }
+
+    #region Pulse class
+
+    private class Pulse
+    {
+        public readonly int Id;
+        public readonly Vector2 Center;
+        public readonly SonarWave SonarWave;
+        public float Duration;
+        public float Radius;
+        public float Speed;
+        public float Elapsed;
+
+        private static int nextId_;
+
+        internal Pulse(GameObject waveObject, Vector2 center, float duration, float radius, float speed)
+        {
+            Center = center;
+            Duration = duration;
+            Radius = radius;
+            Speed = speed;
+            Id = ++nextId_;
+
+            if (waveObject != null)
+            {
+                SonarWave = waveObject.GetComponent<SonarWave>();
+            }
+
+            if (SonarWave != null)
+            {
+                SonarWave.duration = Duration;
+                SonarWave.radius = Radius;
+                SonarWave.speed = Speed;
+
+                if (!SonarWave.autoPulse)
+                {
+                    SonarWave.Pulse();
+                }
+            }
+        }
+    }
+
+    #endregion
 }
