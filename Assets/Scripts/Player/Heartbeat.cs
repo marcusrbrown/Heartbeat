@@ -43,15 +43,7 @@ public class Heartbeat : MonoBehaviour
 
         if (this.pulseWave != null)
         {
-            // Face the wave torwards camera.
-            // MRBrown@PM 1/26/2013: TODO: Do this in the wave, not here.
-            Camera mainCamera = this.camera ? this.camera : Camera.main;
-            Quaternion cameraRotation = mainCamera.transform.rotation;
-            Vector3 position = this.transform.position;
-            Quaternion rotation = Quaternion.LookRotation(position + (cameraRotation * Vector3.back),
-                                                          cameraRotation * Vector3.up);
-
-            sonarWave = Instantiate(this.pulseWave, position, this.transform.rotation) as GameObject;
+            sonarWave = Instantiate(this.pulseWave, this.transform.position, this.transform.rotation) as GameObject;
         }
 
         Pulse wave = new Pulse(sonarWave, center, this.pulseWaveDuration, this.pulseStartRadius, this.pulseWaveSpeed);

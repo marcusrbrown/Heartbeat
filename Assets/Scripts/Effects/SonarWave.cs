@@ -24,10 +24,6 @@ public class SonarWave : MonoBehaviour
         elapsed_ = 0.0f;
         pulseRadius_ = this.radius;
 
-        // Position the line renderer along the Y axis (world coordinates).
-        drawPosition_.y = this.y;
-        this.transform.position = drawPosition_;
-
         lineRenderer_.enabled = true;
         pulsing_ = true;
     }
@@ -46,7 +42,17 @@ public class SonarWave : MonoBehaviour
     {
         lineRenderer_ = this.gameObject.GetComponent<LineRenderer>();
         lineRenderer_.enabled = false;
-        drawPosition_ = this.gameObject.transform.position;
+
+        // Face along the up axis towards the camera.
+        Camera mainCamera = this.camera ? this.camera : Camera.main;
+        Quaternion cameraRotation = mainCamera.transform.rotation;
+
+        this.transform.LookAt(this.transform.position + (cameraRotation * Vector3.back), cameraRotation * Vector3.up);
+
+        Vector3 position = this.transform.position;
+
+        position.y = this.y;
+        this.transform.position = position;
     }
 
     private IEnumerator Start()
@@ -70,6 +76,7 @@ public class SonarWave : MonoBehaviour
         if (elapsed_ >= this.duration)
         {
             pulsing_ = false;
+            lineRenderer_.enabled = false;
         }
 
         if (!pulsing_)
@@ -88,9 +95,9 @@ public class SonarWave : MonoBehaviour
         for (int i = 0; i < (segments + 1); ++i)
         {
             float x = Mathf.Sin(angle * Mathf.Deg2Rad);
-            float z = Mathf.Cos(angle * Mathf.Deg2Rad);
+            float y = Mathf.Cos(angle * Mathf.Deg2Rad);
 
-            lineRenderer_.SetPosition(i, new Vector3(x, 0.0f, z) * pulseRadius_);
+            lineRenderer_.SetPosition(i, new Vector3(x, y, 0.0f) * pulseRadius_);
             angle += (360.0f / segments);
         }
     }
