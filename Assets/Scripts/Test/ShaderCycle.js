@@ -1,4 +1,4 @@
-var colorStart : Color = Color(0.25, 0.25, 0.25, 1);
+var colorStart : Color = Color(00, 0, 0, 1);
 var colorEnd : Color = Color(1, 1, 1, 1);
 var duration : float = 1.75;
 
