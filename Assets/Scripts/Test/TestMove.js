@@ -23,7 +23,12 @@ if(initialDelay)
 if(delayOver==true && initialDelay==false){
 	    localTime += Time.deltaTime;
 	    if(radar == true){
-	    	    transform.Rotate(0, speedVar, 0);
+	    		if(flip==false){
+	    		 transform.Rotate(0, speedVar, 0);
+	    		 }
+	    		if(flip){
+	    	    transform.Rotate(0, -speedVar, 0);
+	    	    }
 	    	   }else{
 	    if(flip==false)
 	    {
