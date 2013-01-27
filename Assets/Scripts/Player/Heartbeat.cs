@@ -39,6 +39,11 @@ public class Heartbeat : MonoBehaviour
         }
 	}
 
+    private void OnTriggerEnter(Collider other)
+    {
+        metagame_.CheckPlayerCollsion(other);
+    }
+
     // MRBrown@PM 1/25/2013: TODO: Support a paused state.
     private void Ping()
     {

@@ -61,6 +61,14 @@ public class Metagame : MonoBehaviour
         pickupCount_++;
     }
 
+    public void CheckPlayerCollsion(Collider other)
+    {
+        if (other.tag == "Enemy")
+        {
+            this.player.BroadcastMessage("Explode");
+        }
+    }
+
     public static Metagame GetInstance()
     {
         if (instance_ == null)
