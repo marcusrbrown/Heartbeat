@@ -102,7 +102,7 @@ public class Heartbeat : MonoBehaviour
             float radius = sonarWave != null ? sonarWave.GetPulseRadius() : pulse.Radius;
 
             pulse.Radius = radius + pulse.Speed * deltaTime;
-            metagame_.CheckPulseCollisions(pulse.Center, pulse.Radius);
+            metagame_.CheckPulseCollisions(pulse.Center, pulse.Radius, pulse.MaxRadius);
         }
     }
 
@@ -113,6 +113,7 @@ public class Heartbeat : MonoBehaviour
         public readonly int Id;
         public readonly Vector2 Center;
         public readonly SonarWave SonarWave;
+        public readonly float MaxRadius;
         public float Duration;
         public float Radius;
         public float Speed;
@@ -144,6 +145,8 @@ public class Heartbeat : MonoBehaviour
                     SonarWave.Pulse();
                 }
             }
+
+            MaxRadius = Radius + Speed * Duration;
         }
     }
 
