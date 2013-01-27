@@ -60,7 +60,6 @@ public class Heartbeat : MonoBehaviour
         Pulse wave = new Pulse(sonarWave, center, this.pulseWaveDuration, this.pulseStartRadius, this.pulseWaveSpeed);
 
         activePulses_.Add(wave.Id, wave);
-		audio.Play ();
         return wave;
     }
 
