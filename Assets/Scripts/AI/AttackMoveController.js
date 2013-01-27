@@ -33,7 +33,11 @@ function OnDisable () {
 }
 
 function Update () {
-    player = GameObject.FindWithTag ("Player").transform;
+    if (Metagame.GetInstance().IsRespawning()) {
+        player = Metagame.GetInstance().playerSpawn;
+    } else {
+        player = GameObject.FindWithTag ("Player").transform;
+    }
 	// Calculate the direction from the player to this character
 	var playerToCharacterDirection : Vector3 = (character.position - player.position);
 	//playerToCharacterDirection.y = 0;
