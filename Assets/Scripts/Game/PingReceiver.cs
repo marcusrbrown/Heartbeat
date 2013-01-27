@@ -1,8 +1,30 @@
 using UnityEngine;
 
+public enum PingReceiverState
+{
+    // The receiver has been initialized.
+    Awake,
+
+    // The receiver is registered and active.
+    Active,
+
+    // The receiver was detected by a ping.
+    Detected,
+}
+
 public class PingReceiver : MonoBehaviour
 {
+    // Specifies how long the receiver should remain detected.
+    public float detectedDuration = 1.0f;
+
     private Metagame metagame_;
+    private PingReceiverState state_;
+    private float detectedElapsed_;
+
+    public PingReceiverState GetState()
+    {
+        return state_;
+    }
 
     public Vector2 GetPingPoint()
     {
@@ -11,6 +33,9 @@ public class PingReceiver : MonoBehaviour
 
     public void Ping()
     {
+        state_ = PingReceiverState.Detected;
+        detectedElapsed_ = 0.0f;
+
         OnPing();
     }
 
@@ -31,10 +56,14 @@ public class PingReceiver : MonoBehaviour
             this.enabled = false;
             return;
         }
+
+        state_ = PingReceiverState.Awake;
     }
 
     private void Start()
     {
+        state_ = PingReceiverState.Active;
+
         // Register ourselves with the metagame as a ping receiver.
         metagame_.RegisterPingReceiver(this);
     }
@@ -43,5 +72,22 @@ public class PingReceiver : MonoBehaviour
     {
         // Unregister ourselves as a ping receiver.
         metagame_.UnregisterPingReceiver(this);
+    }
+
+    private void Update()
+    {
+        float deltaTime = Time.deltaTime;
+
+        if (state_ == PingReceiverState.Detected)
+        {
+            detectedElapsed_ += deltaTime;
+
+            if (detectedElapsed_ >= this.detectedDuration)
+            {
+                // This receiver can be detected again.
+                state_ = PingReceiverState.Active;
+                return;
+            }
+        }
     }
 }

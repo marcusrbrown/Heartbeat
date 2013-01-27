@@ -4,25 +4,16 @@ using System.Linq;
 
 public class Metagame : MonoBehaviour
 {
-    private enum ReceiverState
-    {
-        // The receiver is registered and active.
-        Active,
-
-        // The receiver was detected by a ping.
-        Detected,
-    }
-
     public GameObject player;
     public GameObject enemies;
     public GameObject items;
 
     private Heartbeat heartbeat_;
-    private Dictionary<PingReceiver, ReceiverInfo> receivers_ = new Dictionary<PingReceiver, ReceiverInfo>();
+    private LinkedList<PingReceiver> receivers_ = new LinkedList<PingReceiver>();
 
     public void RegisterPingReceiver(PingReceiver receiver)
     {
-        receivers_.Add(receiver, new ReceiverInfo(receiver));
+        receivers_.AddLast(receiver);
     }
 
     public void UnregisterPingReceiver(PingReceiver receiver)
@@ -33,16 +24,13 @@ public class Metagame : MonoBehaviour
     public void CheckPulseCollisions(Vector2 pulseCenter, float pulseRadius)
     {
         // Look at all ping receivers that are active, but not already detected.
-        var activeReceivers = receivers_.Values.Where(r => r.State == ReceiverState.Active);
+        var activeReceivers = receivers_.Where(r => r.GetState() == PingReceiverState.Active);
 
-        foreach (ReceiverInfo active in activeReceivers)
+        foreach (PingReceiver receiver in activeReceivers)
         {
-            PingReceiver receiver = active.Receiver;
-
             if (IsPointInCircle(receiver.GetPingPoint(), pulseCenter, pulseRadius))
             {
                 receiver.Ping();
-                active.State = ReceiverState.Detected;
             }
         }
     }
@@ -78,20 +66,4 @@ public class Metagame : MonoBehaviour
 
         return distanceSq < (radius * radius);
     }
-
-    #region ReceiverInfo nested class
-
-    class ReceiverInfo
-    {
-        public readonly PingReceiver Receiver;
-        public ReceiverState State;
-
-        internal ReceiverInfo(PingReceiver receiver)
-        {
-            Receiver = receiver;
-            State = ReceiverState.Active;
-        }
-    }
-
-    #endregion
 }
