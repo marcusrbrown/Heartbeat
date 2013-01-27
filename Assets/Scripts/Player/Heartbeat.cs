@@ -87,7 +87,11 @@ public class Heartbeat : MonoBehaviour
         if (elapsed_ >= this.interval)
         {
             elapsed_ = 0.0f;
-            Ping();
+
+            if (!metagame_.IsRespawning())
+            {
+                Ping();
+            }
         }
 
         UpdatePulses(deltaTime);

@@ -7,12 +7,18 @@ public class Metagame : MonoBehaviour
     public GameObject player;
     public GameObject enemies;
     public GameObject items;
+    public Transform playerSpawn;
+    public float respawnDuration = 3.5f;
 
     private Heartbeat heartbeat_;
     private GameObject blip_;
     private LinkedList<PingReceiver> receivers_ = new LinkedList<PingReceiver>();
+    private Vector3 playerSpawnPosition_;
+    private Quaternion playerSpawnRotation_;
 
     private int pickupCount_;
+    private float respawnTimer_;
+    private bool respawning_;
 
     private static Metagame instance_;
 
@@ -29,6 +35,11 @@ public class Metagame : MonoBehaviour
     public void UnregisterPingReceiver(PingReceiver receiver)
     {
         receivers_.Remove(receiver);
+    }
+
+    public bool IsRespawning()
+    {
+        return respawning_;
     }
 
     public void CheckPulseCollisions(Heartbeat.Pulse pulse)
@@ -63,9 +74,11 @@ public class Metagame : MonoBehaviour
 
     public void CheckPlayerCollsion(Collider other)
     {
-        if (other.tag == "Enemy")
+        if ((other.tag == "Enemy") && !respawning_)
         {
             this.player.BroadcastMessage("Explode");
+            respawnTimer_ = 0.0f;
+            respawning_ = true;
         }
     }
 
@@ -94,6 +107,17 @@ public class Metagame : MonoBehaviour
             return;
         }
 
+        if (this.playerSpawn == null)
+        {
+            playerSpawnPosition_ = this.player.transform.position;
+            playerSpawnRotation_ = this.player.transform.rotation;
+        }
+        else
+        {
+            playerSpawnPosition_ = this.playerSpawn.position;
+            playerSpawnRotation_ = this.playerSpawn.rotation;
+        }
+
         if (this.enemies == null)
         {
             Debug.LogWarning("Attach a GameObject containing enemies to the Metagame component.");
@@ -113,6 +137,26 @@ public class Metagame : MonoBehaviour
         if (blip_ == null)
         {
             Debug.LogWarning("Couldn't load the Blip resource.");
+        }
+    }
+
+    private void Update()
+    {
+        float deltaTime = Time.deltaTime;
+
+        if (respawning_)
+        {
+            respawnTimer_ += deltaTime;
+
+            if (respawnTimer_ >= this.respawnDuration)
+            {
+                respawning_ = false;
+
+                this.player.BroadcastMessage("UnExplode");
+
+                //this.player = Instantiate(oldPlayer, playerSpawnPosition_, playerSpawnRotation_) as GameObject;
+                this.player.active = true;
+            }
         }
     }
 
