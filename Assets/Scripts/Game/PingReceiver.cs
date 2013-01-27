@@ -10,19 +10,23 @@ public enum PingReceiverState
 
     // The receiver was detected by a ping.
     Detected,
+
+    // The reciever is in a cooling down after detection.
+    Cooldown,
 }
 
 public class PingReceiver : MonoBehaviour
 {
     // Specifies how long the receiver should remain detected.
     public float detectedDuration = 1.0f;
+    public float cooldownDuration = 2.0f;
 
     public float pulseFadeSpeed = 1.0f;
     public Material pulseEchoMaterial;
 
     private Metagame metagame_;
     private PingReceiverState state_;
-    private float detectedElapsed_;
+    private float stateElapsed_;
 
     private Vector3 pulsePosition_;
     private float pulseRadius_;
@@ -43,8 +47,7 @@ public class PingReceiver : MonoBehaviour
 
     public void Ping(Heartbeat.Pulse pulse)
     {
-        state_ = PingReceiverState.Detected;
-        detectedElapsed_ = 0.0f;
+        SetState(PingReceiverState.Detected);
 
         // Use this transform's Y so that the pulse appears to come from the same plane as the object.
         pulsePosition_ = new Vector3(pulse.Center.x, pulse.Center.y, this.transform.position.z);
@@ -64,6 +67,12 @@ public class PingReceiver : MonoBehaviour
         Debug.Log(debugString);
     }
 
+    private void SetState(PingReceiverState state)
+    {
+        state_ = state;
+        stateElapsed_ = 0.0f;
+    }
+
     private void Awake()
     {
         GameObject metagameObject = GameObject.FindGameObjectWithTag("Metagame");
@@ -75,12 +84,12 @@ public class PingReceiver : MonoBehaviour
             return;
         }
 
-        state_ = PingReceiverState.Awake;
+        SetState(PingReceiverState.Awake);
     }
 
     private void Start()
     {
-        state_ = PingReceiverState.Active;
+        SetState(PingReceiverState.Active);
 
         // Register ourselves with the metagame as a ping receiver.
         metagame_.RegisterPingReceiver(this);
@@ -96,16 +105,18 @@ public class PingReceiver : MonoBehaviour
     {
         float deltaTime = Time.deltaTime;
 
-        if (state_ == PingReceiverState.Detected)
-        {
-            detectedElapsed_ += deltaTime;
+        stateElapsed_ += deltaTime;
 
-            if (detectedElapsed_ >= this.detectedDuration)
-            {
-                // This receiver can be detected again.
-                state_ = PingReceiverState.Active;
-                return;
-            }
+        if ((state_ == PingReceiverState.Detected) && (stateElapsed_ >= this.detectedDuration))
+        {
+            // Put the receiver into cooldown.
+            SetState(PingReceiverState.Cooldown);
+        }
+
+        if ((state_ == PingReceiverState.Cooldown) && (stateElapsed_ >= this.cooldownDuration))
+        {
+            // This receiver can be detected again.
+            SetState(PingReceiverState.Active);
         }
 
         if (pulsing_)
