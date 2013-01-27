@@ -16,6 +16,9 @@ public var cursorFacingCamera : float = 0;
 public var cursorSmallerWithDistance : float = 0;
 public var cursorSmallerWhenClose : float = 1;
 
+// MRBrown@PM 1/27/2013: Don't want the mouse.
+public var disableMouse : System.Boolean;
+
 // Private memeber data
 private var mainCamera : Camera;
 
@@ -164,30 +167,39 @@ function Update () {
 		
 		#else
 	
-			// On PC, the cursor point is the mouse position
-			var cursorScreenPosition : Vector3 = Input.mousePosition;
+            if (disableMouse) {
+			    // On consoles use the analog sticks
+			    var axisX : float = Input.GetAxis("LookHorizontal");
+			    var axisY : float = Input.GetAxis("LookVertical");
+			    motor.facingDirection = axisX * screenMovementRight + axisY * screenMovementForward;
+	
+			    cameraAdjustmentVector = motor.facingDirection;		
+            } else {
+			    // On PC, the cursor point is the mouse position
+			    var cursorScreenPosition : Vector3 = Input.mousePosition;
 						
-			// Find out where the mouse ray intersects with the movement plane of the player
-			var cursorWorldPosition : Vector3 = ScreenPointToWorldPointOnPlane (cursorScreenPosition, playerMovementPlane, mainCamera);
+			    // Find out where the mouse ray intersects with the movement plane of the player
+			    var cursorWorldPosition : Vector3 = ScreenPointToWorldPointOnPlane (cursorScreenPosition, playerMovementPlane, mainCamera);
 			
-			var halfWidth : float = Screen.width / 2.0f;
-			var halfHeight : float = Screen.height / 2.0f;
-			var maxHalf : float = Mathf.Max (halfWidth, halfHeight);
+			    var halfWidth : float = Screen.width / 2.0f;
+			    var halfHeight : float = Screen.height / 2.0f;
+			    var maxHalf : float = Mathf.Max (halfWidth, halfHeight);
 			
-			// Acquire the relative screen position			
-			var posRel : Vector3 = cursorScreenPosition - Vector3 (halfWidth, halfHeight, cursorScreenPosition.z);		
-			posRel.x /= maxHalf; 
-			posRel.y /= maxHalf;
+			    // Acquire the relative screen position			
+			    var posRel : Vector3 = cursorScreenPosition - Vector3 (halfWidth, halfHeight, cursorScreenPosition.z);		
+			    posRel.x /= maxHalf; 
+			    posRel.y /= maxHalf;
 						
-			cameraAdjustmentVector = posRel.x * screenMovementRight + posRel.y * screenMovementForward;
-			cameraAdjustmentVector.y = 0.0;	
+			    cameraAdjustmentVector = posRel.x * screenMovementRight + posRel.y * screenMovementForward;
+			    cameraAdjustmentVector.y = 0.0;	
 									
-			// The facing direction is the direction from the character to the cursor world position
-			motor.facingDirection = (cursorWorldPosition - character.position);
-			motor.facingDirection.y = 0;			
+			    // The facing direction is the direction from the character to the cursor world position
+			    motor.facingDirection = (cursorWorldPosition - character.position);
+			    motor.facingDirection.y = 0;			
 			
-			// Draw the cursor nicely
-			HandleCursorAlignment (cursorWorldPosition);
+			    // Draw the cursor nicely
+			    HandleCursorAlignment (cursorWorldPosition);
+            }
 			
 		#endif
 		
