@@ -32,15 +32,14 @@ public class Heartbeat : MonoBehaviour
 	}
 
     // MRBrown@PM 1/25/2013: TODO: Support a paused state.
-    private IEnumerator Ping()
+    private void Ping()
     {
-        Debug.Log("Ping!");
+        //Debug.Log("Ping!");
 
         // The center is wherever the player currently is located.
         Vector2 center = new Vector2(this.transform.position.x, this.transform.position.z);
 
         CreatePulse(center);
-        yield break;
     }
 
     private Pulse CreatePulse(Vector2 center)
@@ -68,7 +67,7 @@ public class Heartbeat : MonoBehaviour
         activePulses_.Remove(pulse.Id);
     }
 
-	private void Update()
+	private void FixedUpdate()
     {
         float deltaTime = Time.deltaTime;
 
@@ -77,7 +76,7 @@ public class Heartbeat : MonoBehaviour
         if (elapsed_ >= this.interval)
         {
             elapsed_ = 0.0f;
-            StartCoroutine(Ping());
+            Ping();
         }
 
         UpdatePulses(deltaTime);

@@ -78,9 +78,9 @@ public class PingReceiver : MonoBehaviour
 
     protected virtual void OnPing()
     {
-        string debugString = string.Format("{0} ({1}, {2}): Ping received!", gameObject.name, GetPingPoint().x, GetPingPoint().y);
+//        string debugString = string.Format("{0} ({1}, {2}): Ping received!", gameObject.name, GetPingPoint().x, GetPingPoint().y);
 
-        Debug.Log(debugString);
+//        Debug.Log(debugString);
     }
 
     private void SetState(PingReceiverState state)
@@ -122,7 +122,7 @@ public class PingReceiver : MonoBehaviour
         metagame_.UnregisterPingReceiver(this);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         float deltaTime = Time.deltaTime;
 

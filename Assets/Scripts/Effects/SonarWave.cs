@@ -67,7 +67,7 @@ public class SonarWave : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         float deltaTime = Time.deltaTime;
 
