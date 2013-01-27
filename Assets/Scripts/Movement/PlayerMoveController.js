@@ -169,8 +169,8 @@ function Update () {
 	
             if (disableMouse) {
 			    // On consoles use the analog sticks
-			    var axisX : float = Input.GetAxis("LookHorizontal");
-			    var axisY : float = Input.GetAxis("LookVertical");
+			    var axisX : float = Input.GetAxis("Horizontal");
+			    var axisY : float = Input.GetAxis("Vertical");
 			    motor.facingDirection = axisX * screenMovementRight + axisY * screenMovementForward;
 	
 			    cameraAdjustmentVector = motor.facingDirection;		
