@@ -1,7 +1,7 @@
 Shader "Custom/PulseEcho" {
     Properties {
         _MainTex ("Base (RGB)", 2D) = "white" {}
-        _MainColor ("Main Color", Color) = (1.0, 1.0, 1.0, 1.0) // Echo color
+        _Color ("Color", Color) = (1.0, 1.0, 1.0, 1.0) // Echo color
         _Position ("Position", Vector) = (0.0, 0.0, 0.0) // Position of pulse center in world coordinates
         _Radius ("Radius", float) = 1.0
         _MaxRadius ("Max Radius", float) = 5.0
@@ -17,7 +17,7 @@ Shader "Custom/PulseEcho" {
         #pragma surface surf NoLighting
 
         sampler2D _MainTex;
-        float4 _MainColor;
+        float4 _Color;
         float3 _Position;
         float  _Radius;
         float  _MaxRadius;
@@ -47,7 +47,7 @@ Shader "Custom/PulseEcho" {
 
             // Blend the echo color if the pixel is inside the sphere and there's still a fade value.
             if (dist < _Radius && fade > 0.0) {
-                o.Albedo = _MainColor.rgb * c1 + tex2D(_MainTex, IN.uv_MainTex).rgb * c2;
+                o.Albedo = _Color.rgb * c1 + tex2D(_MainTex, IN.uv_MainTex).rgb * c2;
             } else {
                 o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
             }
