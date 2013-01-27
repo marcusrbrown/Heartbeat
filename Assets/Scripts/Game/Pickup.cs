@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Pickup : MonoBehaviour
 {
-public GameObject target;
-public GameObject targetExploder;
+    public GameObject target;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
@@ -14,8 +14,8 @@ public GameObject targetExploder;
             {
                 handler.HandlePickup(this);
             }
+
 			target.BroadcastMessage("yay");
-			targetExploder.BroadcastMessage ("Explode");
             Destroy(this.gameObject);
         }
     }
