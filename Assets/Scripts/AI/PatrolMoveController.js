@@ -10,6 +10,7 @@ public var patrolPointRadius : float = 0.5;
 private var character : Transform;
 private var nextPatrolPoint : int = 0;
 private var patrolDirection : int = 1;
+private var patroller : GameObject;
 
 function Awake () {
 	if (patrolRoute == null) {
@@ -20,8 +21,15 @@ function Awake () {
 
 function Start () {
 	character = motor.transform;
+
+    if (transform.parent)
+        patroller = transform.parent.gameObject;
+
+    if (!patroller)
+        patroller = character.gameObject;
+
 	if (patrolRoute != null)
-	    patrolRoute.Register (transform.parent.gameObject);
+	    patrolRoute.Register (patroller);
 }
 
 function OnEnable () {
@@ -31,7 +39,7 @@ function OnEnable () {
 
 function OnDestroy () {
 	if (patrolRoute != null)
-	    patrolRoute.UnRegister (transform.parent.gameObject);
+	    patrolRoute.UnRegister (patroller);
 }
 
 function Update () {
