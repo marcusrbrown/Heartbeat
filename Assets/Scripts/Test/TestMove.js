@@ -3,6 +3,7 @@ var speedVar : float = 1;
 var delayTime : float = 1;
 var animPause : float = 1;
 var flip : boolean = true;
+var radar : boolean = false;
 private var localTime = 0.0;
 private var delayOver : boolean = true;
 private var initialDelay : boolean = true;
@@ -21,6 +22,9 @@ if(initialDelay)
 
 if(delayOver==true && initialDelay==false){
 	    localTime += Time.deltaTime;
+	    if(radar == true){
+	    	    transform.Rotate(0, speedVar, 0);
+	    	   }else{
 	    if(flip==false)
 	    {
 	    transform.Rotate(0, speedVar, 0);
@@ -42,6 +46,7 @@ if(delayOver==true && initialDelay==false){
 		    }
 		}
 	}	    
+	}
 }
 
 
