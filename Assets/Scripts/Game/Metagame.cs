@@ -38,8 +38,18 @@ public class Metagame : MonoBehaviour
 
         foreach (PingReceiver receiver in activeReceivers)
         {
-            if (IsRectInCircle(receiver.GetPingRect(), pulse.Center, pulse.Radius)
-                || IsPointInCircle(receiver.GetPingPoint(), pulse.Center, pulse.Radius))
+            Rect receiverRect = receiver.GetPingRect();
+            Vector2 receiverCenter = receiver.GetPingPoint();
+
+            // Skip enemies that are inside of the player's visible circle.
+            if (IsRectInCircle(receiverRect, heartbeat_.GetCenter(), heartbeat_.visbleAreaRadius)
+                || IsPointInCircle(receiverCenter, heartbeat_.GetCenter(), heartbeat_.visbleAreaRadius))
+            {
+                continue;
+            }
+
+            if (IsRectInCircle(receiverRect, pulse.Center, pulse.Radius)
+                || IsPointInCircle(receiverCenter, pulse.Center, pulse.Radius))
             {
                 receiver.Ping(pulse);
             }

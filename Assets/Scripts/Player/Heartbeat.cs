@@ -9,6 +9,7 @@ public class Heartbeat : MonoBehaviour
     public float pulseWaveDuration = 5.0f;
     public float pulseWaveSpeed = 1.0f;
     public float pulseStartRadius = 1.0f;
+    public float visbleAreaRadius = 3.0f;
     public GameObject pulseWave;
 	public AudioSource beeps;
 
@@ -20,6 +21,12 @@ public class Heartbeat : MonoBehaviour
     public void SetMetagame(Metagame metagame)
     {
         metagame_ = metagame;
+    }
+
+    public Vector2 GetCenter()
+    {
+        // The center is wherever the player currently is located.
+        return new Vector2(this.transform.position.x, this.transform.position.z);
     }
 
     private void Start()
@@ -38,10 +45,7 @@ public class Heartbeat : MonoBehaviour
 		 beeps.Play();
         //Debug.Log("Ping!");
 
-        // The center is wherever the player currently is located.
-        Vector2 center = new Vector2(this.transform.position.x, this.transform.position.z);
-
-        CreatePulse(center);
+        CreatePulse(GetCenter());
     }
 
     private Pulse CreatePulse(Vector2 center)
