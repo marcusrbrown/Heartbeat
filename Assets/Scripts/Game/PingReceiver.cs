@@ -21,7 +21,7 @@ public class PingReceiver : MonoBehaviour
     public float detectedDuration = 1.0f;
     public float cooldownDuration = 2.0f;
 
-    public float pulseFadeSpeed = 1.0f;
+    public float pulseFadeDuration = 1.0f;
 
     private Metagame metagame_;
     private PingReceiverState state_;
@@ -32,7 +32,10 @@ public class PingReceiver : MonoBehaviour
     private float pulseMaxRadius_;
     private float pulseWaveSpeed_;
     private float pulseFade_;
+    private float pulseFadeTime_;
+    private int lastPulseId_;
     private bool pulsing_;
+    private bool fading_;
 
     private GameObject blipInstance_;
     private Material pulseEchoMaterial_;
@@ -51,13 +54,18 @@ public class PingReceiver : MonoBehaviour
     {
         SetState(PingReceiverState.Detected);
 
-        // Use this transform's Y so that the pulse appears to come from the same plane as the object.
-        pulsePosition_ = new Vector3(pulse.Center.x, pulse.Center.y, this.transform.position.z);
-        pulseRadius_ = pulse.Radius;
-        pulseMaxRadius_ = pulse.MaxRadius;
-        pulseWaveSpeed_ = pulse.Speed;
-        pulseFade_ = 0.0f;
-        pulsing_ = true;
+        if (pulse.Id != lastPulseId_)
+        {
+            // Use this transform's Y so that the pulse appears to come from the same plane as the object.
+            pulsePosition_ = new Vector3(pulse.Center.x, pulse.Center.y, this.transform.position.z);
+            pulseRadius_ = pulse.Radius;
+            pulseMaxRadius_ = pulse.MaxRadius;
+            pulseWaveSpeed_ = pulse.Speed;
+            pulseFade_ = 0.0f;
+            pulseFadeTime_ = 0.0f;
+            pulsing_ = true;
+            lastPulseId_ = pulse.Id;
+        }
 
         if (blipInstance_ != null)
         {
@@ -132,10 +140,7 @@ public class PingReceiver : MonoBehaviour
             SetState(PingReceiverState.Active);
         }
 
-        if (pulsing_)
-        {
-            UpdatePulseEcho(deltaTime);
-        }
+        UpdatePulseEcho(deltaTime);
 
         if (pulseEchoMaterial_ != null)
         {
@@ -145,18 +150,33 @@ public class PingReceiver : MonoBehaviour
 
     private void UpdatePulseEcho(float deltaTime)
     {
-        pulseRadius_ += deltaTime * pulseWaveSpeed_;
-
-        if (pulseRadius_ >= pulseMaxRadius_)
+        if (pulsing_)
         {
-            pulsing_ = false;
+            pulseRadius_ += deltaTime * pulseWaveSpeed_;
+
+            if (pulseRadius_ >= pulseMaxRadius_)
+            {
+                pulsing_ = false;
+                fading_ = true;
+            }
+        }
+        else if (fading_)
+        {
+            pulseFadeTime_ += deltaTime;
+
+            float t = Mathf.Clamp01(pulseFadeTime_ / this.pulseFadeDuration);
+
+            pulseFade_ = Mathf.Lerp(0, pulseWaveSpeed_, t);
+
+            if (pulseFade_ >= this.pulseWaveSpeed_)
+            {
+                fading_ = false;
+            }
         }
     }
 
     private void UpdatePulseEchoMaterial(float deltaTime)
     {
-        pulseFade_ += deltaTime * this.pulseFadeSpeed;
-
         Material material = pulseEchoMaterial_;
 
         material.SetVector("_Position", pulsePosition_);
