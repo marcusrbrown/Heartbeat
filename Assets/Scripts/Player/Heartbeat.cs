@@ -10,6 +10,7 @@ public class Heartbeat : MonoBehaviour
     public float pulseWaveSpeed = 1.0f;
     public float pulseStartRadius = 1.0f;
     public GameObject pulseWave;
+	public AudioSource beeps;
 
     private static Metagame metagame_;
     private float elapsed_;
@@ -34,6 +35,7 @@ public class Heartbeat : MonoBehaviour
     // MRBrown@PM 1/25/2013: TODO: Support a paused state.
     private void Ping()
     {
+		 beeps.Play();
         //Debug.Log("Ping!");
 
         // The center is wherever the player currently is located.
@@ -54,6 +56,7 @@ public class Heartbeat : MonoBehaviour
         Pulse wave = new Pulse(sonarWave, center, this.pulseWaveDuration, this.pulseStartRadius, this.pulseWaveSpeed);
 
         activePulses_.Add(wave.Id, wave);
+		audio.Play ();
         return wave;
     }
 
