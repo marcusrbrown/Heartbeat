@@ -151,6 +151,8 @@ public class PingReceiver : MonoBehaviour
 
     private void DestroyBlipInstance()
     {
+        pulseEchoMaterial_ = null;
+
         if (blipInstance_ != null)
         {
             blipInstance_.renderer.enabled = false;
