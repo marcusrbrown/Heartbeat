@@ -17,7 +17,6 @@ public class PingReceiver : MonoBehaviour
     // Specifies how long the receiver should remain detected.
     public float detectedDuration = 1.0f;
 
-    public float pulseWaveSpeed = 1.0f;
     public float pulseFadeSpeed = 1.0f;
     public Material pulseEchoMaterial;
 
@@ -28,6 +27,7 @@ public class PingReceiver : MonoBehaviour
     private Vector3 pulsePosition_;
     private float pulseRadius_;
     private float pulseMaxRadius_;
+    private float pulseWaveSpeed_;
     private float pulseFade_;
     private bool pulsing_;
 
@@ -41,7 +41,7 @@ public class PingReceiver : MonoBehaviour
         return new Vector2(this.transform.position.x, this.transform.position.z);
     }
 
-    public void Ping(Vector2 pulseCenter, float pulseRadius, float pulseMaxRadius)
+    public void Ping(Vector2 pulseCenter, float pulseRadius, float pulseMaxRadius, float pulseSpeed)
     {
         state_ = PingReceiverState.Detected;
         detectedElapsed_ = 0.0f;
@@ -50,6 +50,7 @@ public class PingReceiver : MonoBehaviour
         pulsePosition_ = new Vector3(pulseCenter.x, pulseCenter.y, this.transform.position.z);
         pulseRadius_ = pulseRadius;
         pulseMaxRadius_ = pulseMaxRadius;
+        pulseWaveSpeed_ = pulseSpeed;
         pulseFade_ = 0.0f;
         pulsing_ = true;
 
@@ -95,39 +96,41 @@ public class PingReceiver : MonoBehaviour
     {
         float deltaTime = Time.deltaTime;
 
-        if (pulsing_ && (this.pulseEchoMaterial != null))
-        {
-            UpdatePulseEchoMaterial(deltaTime);
-        }
-
         if (state_ == PingReceiverState.Detected)
         {
             detectedElapsed_ += deltaTime;
 
             if (detectedElapsed_ >= this.detectedDuration)
             {
-                pulsing_ = false;
-
                 // This receiver can be detected again.
                 state_ = PingReceiverState.Active;
                 return;
             }
         }
 
+        if (pulsing_)
+        {
+            UpdatePulseEcho(deltaTime);
+        }
+
+        if (this.pulseEchoMaterial != null)
+        {
+            UpdatePulseEchoMaterial(deltaTime);
+        }
+    }
+
+    private void UpdatePulseEcho(float deltaTime)
+    {
+        pulseRadius_ += deltaTime * pulseWaveSpeed_;
+
+        if (pulseRadius_ >= pulseMaxRadius_)
+        {
+            pulsing_ = false;
+        }
     }
 
     private void UpdatePulseEchoMaterial(float deltaTime)
     {
-        if (pulsing_)
-        {
-            pulseRadius_ += deltaTime * this.pulseWaveSpeed;
-
-            if (pulseRadius_ >= pulseMaxRadius_)
-            {
-                pulsing_ = false;
-            }
-        }
-
         pulseFade_ += deltaTime * this.pulseFadeSpeed;
 
         Material material = this.pulseEchoMaterial;

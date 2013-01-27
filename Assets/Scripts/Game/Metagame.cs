@@ -21,7 +21,7 @@ public class Metagame : MonoBehaviour
         receivers_.Remove(receiver);
     }
 
-    public void CheckPulseCollisions(Vector2 pulseCenter, float pulseRadius, float pulseMaxRadius)
+    public void CheckPulseCollisions(Vector2 pulseCenter, float pulseRadius, float pulseMaxRadius, float pulseSpeed)
     {
         // Look at all ping receivers that are active, but not already detected.
         var activeReceivers = receivers_.Where(r => r.GetState() == PingReceiverState.Active);
@@ -30,7 +30,7 @@ public class Metagame : MonoBehaviour
         {
             if (IsPointInCircle(receiver.GetPingPoint(), pulseCenter, pulseRadius))
             {
-                receiver.Ping(pulseCenter, pulseRadius, pulseMaxRadius);
+                receiver.Ping(pulseCenter, pulseRadius, pulseMaxRadius, pulseSpeed);
             }
         }
     }

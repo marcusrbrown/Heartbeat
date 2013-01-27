@@ -102,7 +102,7 @@ public class Heartbeat : MonoBehaviour
             float radius = sonarWave != null ? sonarWave.GetPulseRadius() : pulse.Radius;
 
             pulse.Radius = radius + pulse.Speed * deltaTime;
-            metagame_.CheckPulseCollisions(pulse.Center, pulse.Radius, pulse.MaxRadius);
+            metagame_.CheckPulseCollisions(pulse.Center, pulse.Radius, pulse.MaxRadius, pulse.Speed);
         }
     }
 
