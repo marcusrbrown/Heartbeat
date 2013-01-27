@@ -22,7 +22,6 @@ public class PingReceiver : MonoBehaviour
     public float cooldownDuration = 2.0f;
 
     public float pulseFadeSpeed = 1.0f;
-    public Material pulseEchoMaterial;
 
     private Metagame metagame_;
     private PingReceiverState state_;
@@ -34,6 +33,9 @@ public class PingReceiver : MonoBehaviour
     private float pulseWaveSpeed_;
     private float pulseFade_;
     private bool pulsing_;
+
+    private GameObject blipInstance_;
+    private Material pulseEchoMaterial_;
 
     public PingReceiverState GetState()
     {
@@ -56,6 +58,12 @@ public class PingReceiver : MonoBehaviour
         pulseWaveSpeed_ = pulse.Speed;
         pulseFade_ = 0.0f;
         pulsing_ = true;
+
+        if (blipInstance_ != null)
+        {
+            blipInstance_.transform.position = this.transform.position;
+            blipInstance_.renderer.enabled = true;
+        }
 
         OnPing();
     }
@@ -90,6 +98,14 @@ public class PingReceiver : MonoBehaviour
 
         // Register ourselves with the metagame as a ping receiver.
         metagame_.RegisterPingReceiver(this);
+
+        blipInstance_ = Instantiate(metagame_.Blip) as GameObject;
+
+        if (blipInstance_)
+        {
+            blipInstance_.transform.parent = this.transform;
+            pulseEchoMaterial_ = blipInstance_.renderer.material;
+        }
     }
 
     private void OnDestroy()
@@ -121,7 +137,7 @@ public class PingReceiver : MonoBehaviour
             UpdatePulseEcho(deltaTime);
         }
 
-        if (this.pulseEchoMaterial != null)
+        if (pulseEchoMaterial_ != null)
         {
             UpdatePulseEchoMaterial(deltaTime);
         }
@@ -141,7 +157,7 @@ public class PingReceiver : MonoBehaviour
     {
         pulseFade_ += deltaTime * this.pulseFadeSpeed;
 
-        Material material = this.pulseEchoMaterial;
+        Material material = pulseEchoMaterial_;
 
         material.SetVector("_Position", pulsePosition_);
         material.SetFloat("_Radius", pulseRadius_);

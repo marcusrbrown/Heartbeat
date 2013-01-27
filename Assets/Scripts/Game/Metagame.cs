@@ -9,11 +9,17 @@ public class Metagame : MonoBehaviour
     public GameObject items;
 
     private Heartbeat heartbeat_;
+    private GameObject blip_;
     private LinkedList<PingReceiver> receivers_ = new LinkedList<PingReceiver>();
 
     private int pickupCount_;
 
     private static Metagame instance_;
+
+    internal GameObject Blip
+    {
+        get { return blip_; }
+    }
 
     public void RegisterPingReceiver(PingReceiver receiver)
     {
@@ -81,6 +87,14 @@ public class Metagame : MonoBehaviour
 
         heartbeat_ = this.player.GetComponent<Heartbeat>();
         heartbeat_.SetMetagame(this);
+
+        // Load the Blip object used for displaying pings on the radar.
+        blip_ = Resources.Load("Blip") as GameObject;
+
+        if (blip_ == null)
+        {
+            Debug.LogWarning("Couldn't load the Blip resource.");
+        }
     }
 
     private bool IsPointInCircle(Vector2 testPoint, Vector3 center, float radius)
