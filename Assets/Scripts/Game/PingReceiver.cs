@@ -75,11 +75,8 @@ public class PingReceiver : MonoBehaviour
 
     private void Awake()
     {
-        GameObject metagameObject = GameObject.FindGameObjectWithTag("Metagame");
-
-        if ((metagameObject == null) || ((metagame_ = metagameObject.GetComponent<Metagame>()) == null))
+        if ((metagame_ = Metagame.GetInstance()) == null)
         {
-            Debug.LogError("Couldn't locate a GO with the \"Metagame\" tag or it's missing the Metagame script.");
             this.enabled = false;
             return;
         }

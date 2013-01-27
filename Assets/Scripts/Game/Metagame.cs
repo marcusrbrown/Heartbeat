@@ -11,6 +11,8 @@ public class Metagame : MonoBehaviour
     private Heartbeat heartbeat_;
     private LinkedList<PingReceiver> receivers_ = new LinkedList<PingReceiver>();
 
+    private static Metagame instance_;
+
     public void RegisterPingReceiver(PingReceiver receiver)
     {
         receivers_.AddLast(receiver);
@@ -33,6 +35,22 @@ public class Metagame : MonoBehaviour
                 receiver.Ping(pulse);
             }
         }
+    }
+
+    public static Metagame GetInstance()
+    {
+        if (instance_ == null)
+        {
+            GameObject metagameObject = GameObject.FindGameObjectWithTag("Metagame");
+
+            if ((metagameObject == null) || ((instance_ = metagameObject.GetComponent<Metagame>()) == null))
+            {
+                Debug.LogError("Couldn't locate a GO with the \"Metagame\" tag or it's missing the Metagame script.");
+                return null;
+            }
+        }
+
+        return instance_;
     }
 
     private void Awake()
