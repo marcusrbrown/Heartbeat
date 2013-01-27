@@ -8,9 +8,11 @@ Shader "Custom/PulseEcho" {
         _Fade ("Fade", float) = 0.0
     }
     SubShader {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType" = "Opaque" "Queue" = "Overlay" }
         LOD 200
-		
+        Lighting Off Cull Off ZWrite Off Fog { Mode Off } 
+        Blend SrcAlpha OneMinusSrcAlpha
+
         CGPROGRAM
         #pragma surface surf NoLighting
 
