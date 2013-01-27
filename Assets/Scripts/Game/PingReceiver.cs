@@ -72,24 +72,37 @@ public class PingReceiver : MonoBehaviour
 
     public void Ping(Heartbeat.Pulse pulse)
     {
+        if (pulse.Id == lastPulseId_)
+        {
+            return;
+        }
+
         SetState(PingReceiverState.Detected);
 
-        if (pulse.Id != lastPulseId_)
-        {
-            // Use this transform's Y so that the pulse appears to come from the same plane as the object.
-            pulsePosition_ = new Vector3(pulse.Center.x, pulse.Center.y, this.transform.position.z);
-            pulseRadius_ = pulse.Radius;
-            pulseMaxRadius_ = pulse.MaxRadius;
-            pulseWaveSpeed_ = pulse.Speed;
-            pulseFade_ = 0.0f;
-            pulseFadeTime_ = 0.0f;
-            pulsing_ = true;
-            lastPulseId_ = pulse.Id;
-        }
+        // Use this transform's Y so that the pulse appears to come from the same plane as the object.
+        pulsePosition_ = new Vector3(pulse.Center.x, pulse.Center.y, this.transform.position.z);
+        pulseRadius_ = pulse.Radius;
+        pulseMaxRadius_ = pulse.MaxRadius;
+        pulseWaveSpeed_ = pulse.Speed;
+        pulseFade_ = 0.0f;
+        pulseFadeTime_ = 0.0f;
+        pulsing_ = true;
+        lastPulseId_ = pulse.Id;
+
+        DestroyBlipInstance();
+
+        blipInstance_ = Instantiate(metagame_.Blip, this.transform.position, this.transform.rotation) as GameObject;
 
         if (blipInstance_ != null)
         {
-            blipInstance_.transform.position = this.transform.position;
+            pulseEchoMaterial_ = blipInstance_.renderer.material;
+
+            Camera mainCamera = this.camera ? this.camera : Camera.main;
+            Quaternion cameraRotation = mainCamera.transform.rotation;
+
+            blipInstance_.transform.LookAt(blipInstance_.transform.position
+                                                     + (cameraRotation * Vector3.back), cameraRotation * Vector3.up);
+
             blipInstance_.renderer.enabled = true;
         }
 
@@ -126,20 +139,24 @@ public class PingReceiver : MonoBehaviour
 
         // Register ourselves with the metagame as a ping receiver.
         metagame_.RegisterPingReceiver(this);
-
-        blipInstance_ = Instantiate(metagame_.Blip) as GameObject;
-
-        if (blipInstance_)
-        {
-            blipInstance_.transform.parent = this.transform;
-            pulseEchoMaterial_ = blipInstance_.renderer.material;
-        }
     }
 
     private void OnDestroy()
     {
+        DestroyBlipInstance();
+
         // Unregister ourselves as a ping receiver.
         metagame_.UnregisterPingReceiver(this);
+    }
+
+    private void DestroyBlipInstance()
+    {
+        if (blipInstance_ != null)
+        {
+            blipInstance_.renderer.enabled = false;
+            Destroy(blipInstance_);
+            blipInstance_ = null;
+        }
     }
 
     private void FixedUpdate()
@@ -191,6 +208,7 @@ public class PingReceiver : MonoBehaviour
             if (pulseFade_ >= this.pulseWaveSpeed_)
             {
                 fading_ = false;
+                DestroyBlipInstance();
             }
         }
     }
