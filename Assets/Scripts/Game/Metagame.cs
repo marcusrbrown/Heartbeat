@@ -11,6 +11,8 @@ public class Metagame : MonoBehaviour
     private Heartbeat heartbeat_;
     private LinkedList<PingReceiver> receivers_ = new LinkedList<PingReceiver>();
 
+    private int pickupCount_;
+
     private static Metagame instance_;
 
     public void RegisterPingReceiver(PingReceiver receiver)
@@ -35,6 +37,11 @@ public class Metagame : MonoBehaviour
                 receiver.Ping(pulse);
             }
         }
+    }
+
+    public void IncrementPickupCount()
+    {
+        pickupCount_++;
     }
 
     public static Metagame GetInstance()
