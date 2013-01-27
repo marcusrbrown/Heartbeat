@@ -50,6 +50,26 @@ public class PingReceiver : MonoBehaviour
         return new Vector2(this.transform.position.x, this.transform.position.z);
     }
 
+    public Rect GetPingRect()
+    {
+        Collider collider = GetComponent<Collider>();
+
+        if (collider == null)
+        {
+            return new Rect(-10000.0f, -10000.0f, 1.0f, 1.0f);
+        }
+
+        Bounds bounds = collider.bounds;
+        Vector3 worldMin = this.transform.TransformPoint(bounds.min);
+        Vector3 worldMax = this.transform.TransformPoint(bounds.max);
+        float left = worldMin.x;
+        float top = worldMin.z;
+        float width = worldMax.x - left;
+        float height = worldMax.z - top;
+
+        return new Rect(left, top, width, height);
+    }
+
     public void Ping(Heartbeat.Pulse pulse)
     {
         SetState(PingReceiverState.Detected);

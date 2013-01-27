@@ -38,7 +38,8 @@ public class Metagame : MonoBehaviour
 
         foreach (PingReceiver receiver in activeReceivers)
         {
-            if (IsPointInCircle(receiver.GetPingPoint(), pulse.Center, pulse.Radius))
+            if (IsRectInCircle(receiver.GetPingRect(), pulse.Center, pulse.Radius)
+                || IsPointInCircle(receiver.GetPingPoint(), pulse.Center, pulse.Radius))
             {
                 receiver.Ping(pulse);
             }
@@ -97,12 +98,42 @@ public class Metagame : MonoBehaviour
         }
     }
 
-    private bool IsPointInCircle(Vector2 testPoint, Vector3 center, float radius)
+    private static bool IsPointInCircle(Vector2 testPoint, Vector2 center, float radius)
     {
         float xDistance = testPoint.x - center.x;
         float yDistance = testPoint.y - center.y;
         float distanceSq = (xDistance * xDistance) + (yDistance * yDistance);
 
         return distanceSq < (radius * radius);
+    }
+
+    private static bool IsRectInCircle(Rect rect, Vector2 center, float radius)
+    {
+        Vector3 circleDistance = new Vector2(Mathf.Abs(center.x - rect.x), Mathf.Abs(center.y - rect.y));
+
+        if (circleDistance.x > ((rect.width / 2) + radius))
+        {
+            return false;
+        }
+
+        if (circleDistance.y > ((rect.height / 2) + radius))
+        {
+            return false;
+        }
+
+        if (circleDistance.x <= (rect.width / 2))
+        {
+            return true;
+        }
+
+        if (circleDistance.y <= (rect.width / 2))
+        {
+            return true;
+        }
+
+        float cornerDistanceSq = Mathf.Pow(circleDistance.x - (rect.width / 2), 2)
+                                           + Mathf.Pow(circleDistance.y - (rect.height / 2), 2);
+
+        return cornerDistanceSq < (radius * radius);
     }
 }
