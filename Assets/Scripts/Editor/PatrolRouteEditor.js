@@ -29,7 +29,7 @@ class PatrolRouteEditor extends Editor {
 	}
 	
 	static function DrawPatrolRoute (route : PatrolRoute) {
-		if (route.patrolPoints.Count == 0)
+		if (!route || !route.patrolPoints || route.patrolPoints.Count == 0)
 			return;
 		
 		var lastPoint : Vector3 = route.patrolPoints[0].transform.position;

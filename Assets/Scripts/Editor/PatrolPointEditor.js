@@ -5,6 +5,10 @@ class PatrolPointEditor extends Editor {
 	function OnInspectorGUI () {
 		var point : PatrolPoint = target as PatrolPoint;
 		var route : PatrolRoute = point.transform.parent.GetComponent.<PatrolRoute>();
+
+        if (!route)
+            return;
+
 		var thisIndex : int = route.GetIndexOfPatrolPoint (point);
 		
 		if (GUILayout.Button ("Remove This Patrol Point")) {
