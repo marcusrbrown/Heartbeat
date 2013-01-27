@@ -41,16 +41,16 @@ public class PingReceiver : MonoBehaviour
         return new Vector2(this.transform.position.x, this.transform.position.z);
     }
 
-    public void Ping(Vector2 pulseCenter, float pulseRadius, float pulseMaxRadius, float pulseSpeed)
+    public void Ping(Heartbeat.Pulse pulse)
     {
         state_ = PingReceiverState.Detected;
         detectedElapsed_ = 0.0f;
 
         // Use this transform's Y so that the pulse appears to come from the same plane as the object.
-        pulsePosition_ = new Vector3(pulseCenter.x, pulseCenter.y, this.transform.position.z);
-        pulseRadius_ = pulseRadius;
-        pulseMaxRadius_ = pulseMaxRadius;
-        pulseWaveSpeed_ = pulseSpeed;
+        pulsePosition_ = new Vector3(pulse.Center.x, pulse.Center.y, this.transform.position.z);
+        pulseRadius_ = pulse.Radius;
+        pulseMaxRadius_ = pulse.MaxRadius;
+        pulseWaveSpeed_ = pulse.Speed;
         pulseFade_ = 0.0f;
         pulsing_ = true;
 
