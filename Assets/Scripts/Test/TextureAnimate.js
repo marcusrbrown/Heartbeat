@@ -20,7 +20,10 @@
         //the hackiest hack that ever hacked
    			if(stopAnimatingVar==false)
    			{
-           var index2 : int = (Time.time * framesPerSecond) % frames.Length;     
+           var index2 : int = (Time.time * framesPerSecond) % frames.Length;
+           if (this.guiTexture)
+            this.guiTexture.texture = frames[index2];
+            else
             renderer.material.mainTexture = frames[index2];
             if(index2==1)
             {
@@ -29,6 +32,9 @@
             }
         }else{
         var index : int = (Time.time * currentFrames) % frames.Length;
+        if (this.guiTexture)
+        this.guiTexture.texture = frames[index];
+        else
         renderer.material.mainTexture = frames[index];
         //need to stretch the z of this plane over time to equal currentsize whether that be lower or higher
     }
