@@ -2,7 +2,7 @@ public var scoreText : int = 1;
 
 function yay() 
 {
-scoreText+=1;
+scoreText+=Random.Range(60, 80);
 }
 
 function Update()
