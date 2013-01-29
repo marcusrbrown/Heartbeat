@@ -8,12 +8,15 @@
     var sizeLarge : float;
     var titleScreen : boolean = false;
    var stopAnimatingVar : boolean = false;
-    
-    private var currentFrames : float = framesNormal;
-    private var currentSize : float = sizeNormal;
+   private var currentFrames : float;
+      private var currentSize : float;
+  
+    function Start(){  
+ currentFrames = framesNormal;
+currentSize = sizeNormal;
+     }
      
     function Update() {
-
         if(titleScreen)
         {
 
