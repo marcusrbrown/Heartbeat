@@ -62,7 +62,7 @@ public class Heartbeat : MonoBehaviour
 		heartbeatNormal.Play();	
 		}else if(heartSpeed==1){
 		heartbeatSlow.Play();
-		}else if(heartSpeed==2){
+		}else if(heartSpeed==3){
 		heartbeatFast.Play();
 		}
 		 beeps.Play();
