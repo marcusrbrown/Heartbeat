@@ -1,4 +1,14 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+[Serializable]
+public class RateThreshold
+{
+    public float value;
+    public GameObject target;
+    public string message;
+}
 
 public class RateLimiter : MonoBehaviour
 {
@@ -11,11 +21,26 @@ public class RateLimiter : MonoBehaviour
     // The heart rate limit.
     public float heartRateLimit = 100.0f;
 
+    // Thresholds.
+    public List<RateThreshold> thresholds = new List<RateThreshold>();
+
     private float currentRate_;
     private float limiterHeldTime_;
     private float limiterDrainTime_;
 
+    private float lastThresholdValue_;
     private bool disabledUntilDrain_;
+
+    private void Awake()
+    {
+        // Sort the thresholds.
+        this.thresholds.Sort(CompareRateThresholds);
+    }
+
+    private static int CompareRateThresholds(RateThreshold a, RateThreshold b)
+    {
+        return (int) (a.value - b.value);
+    }
 
     private void FixedUpdate()
     {
@@ -35,11 +60,29 @@ public class RateLimiter : MonoBehaviour
 
                 if (currentRate_ >= this.heartRateLimit)
                 {
-                    currentRate_ = heartRateLimit;
-                    // TODO: Broadcast the signal that the limit has been reached.
+                    currentRate_ = this.heartRateLimit;
+                    lastThresholdValue_ = this.heartRateLimit;
+
+                    // Kill the player.
+                    Metagame.GetInstance().Die();
 
                     // Don't bother with the "held" limiter until the key is let go and begins to "drain".
                     disabledUntilDrain_ = true;
+                }
+                else
+                {
+                    foreach (RateThreshold threshold in this.thresholds)
+                    {
+                        if ((lastThresholdValue_ != threshold.value) && (currentRate_ >= threshold.value))
+                        {
+                            lastThresholdValue_ = threshold.value;
+
+                            if ((threshold.target != null) && !string.IsNullOrEmpty(threshold.message))
+                            {
+                                threshold.target.BroadcastMessage(threshold.message);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -56,6 +99,27 @@ public class RateLimiter : MonoBehaviour
             if (currentRate_ <= 0.0f)
             {
                 currentRate_ = 0.0f;
+                lastThresholdValue_ = 0.0f;
+            }
+            else
+            {
+                for (int i = this.thresholds.Count - 1; i > 0; --i)
+                {
+                    RateThreshold threshold = this.thresholds[i];
+
+                    if ((lastThresholdValue_ != threshold.value) && (currentRate_ < threshold.value))
+                    {
+                        lastThresholdValue_ = threshold.value;
+
+                        // Broadcast to the threshold before this one.
+                        RateThreshold prevThreshold = this.thresholds[i - 1];
+
+                        if ((prevThreshold.target != null) && !string.IsNullOrEmpty(prevThreshold.message))
+                        {
+                            prevThreshold.target.BroadcastMessage(prevThreshold.message);
+                        }
+                    }
+                }
             }
         }
     }
