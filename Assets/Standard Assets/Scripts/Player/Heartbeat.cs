@@ -10,11 +10,21 @@ public class Heartbeat : MonoBehaviour
     public float pulseWaveSpeed = 1.0f;
     public float pulseStartRadius = 1.0f;
     public float visbleAreaRadius = 3.0f;
+	
+	//Added these to change heart speeds
+	public float intervalNormal;
+	public float intervalSlow; 
+	public float intervalFast; 
     public GameObject pulseWave;
+	
 	public AudioSource beeps;
+	public AudioSource heartbeatSlow;
+	public AudioSource heartbeatNormal;
+	public AudioSource heartbeatFast;
 
     private static Metagame metagame_;
     private float elapsed_;
+	private int heartSpeed = 2;
 
     private Dictionary<int, Pulse> activePulses_ = new Dictionary<int, Pulse>();
 
@@ -47,6 +57,14 @@ public class Heartbeat : MonoBehaviour
     // MRBrown@PM 1/25/2013: TODO: Support a paused state.
     private void Ping()
     {
+		//Audio Controller determines which audio to play. 1=slow, 2=normal, 3=fast. See functions at end of file.
+		if(heartSpeed==2){
+		heartbeatNormal.Play();	
+		}else if(heartSpeed==1){
+		heartbeatSlow.Play();
+		}else if(heartSpeed==2){
+		heartbeatFast.Play();
+		}
 		 beeps.Play();
         //Debug.Log("Ping!");
 
@@ -119,6 +137,26 @@ public class Heartbeat : MonoBehaviour
             metagame_.CheckPulseCollisions(pulse);
         }
     }
+	
+	//Sets the heart audio to slow.. if you could lerp the interval change too that would be awesome.
+	private void HeartSlow()
+	{
+		heartSpeed = 1;
+		interval = intervalSlow;
+	}
+	//Sets the heart audio to normal.. if you could lerp the interval change too that would be awesome.
+	private void HeartNormal()
+	{
+		heartSpeed = 2;
+		interval = intervalNormal;
+	}
+	//Sets the heart audio to fast... if you could lerp the interval change too that would be awesome.
+	private void HeartFast()
+	{
+		heartSpeed = 3;
+		interval = intervalFast;
+	}
+
 
     #region Pulse class
 
