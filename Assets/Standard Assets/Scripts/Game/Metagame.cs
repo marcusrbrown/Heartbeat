@@ -76,6 +76,14 @@ public class Metagame : MonoBehaviour
     {
         if ((other.tag == "Enemy") && !respawning_)
         {
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+        if (!IsRespawning())
+        {
             this.player.BroadcastMessage("Explode");
             respawnTimer_ = 0.0f;
             respawning_ = true;
